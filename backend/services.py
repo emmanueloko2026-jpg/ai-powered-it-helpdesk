@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from backend.store import tickets
 
 
@@ -19,3 +21,13 @@ def save_ticket(new_ticket):
     new_ticket["status"] = "Open"
     tickets.append(new_ticket)
     return {"message": "Ticket created successfully", "ticket": new_ticket}
+
+
+def resolve_ticket(ticket_id):
+    find_ticket = find_ticket_by_id(ticket_id)
+    if find_ticket is None:
+        return None
+    if find_ticket["status"] == "Resolved":
+        raise HTTPException(status_code=409, detail="Ticket already resolved")
+    else:
+        find_ticket["status"] = "Resolved"
