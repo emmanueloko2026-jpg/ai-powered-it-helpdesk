@@ -3,7 +3,7 @@ from backend.models import TicketCreate
 from backend.store import tickets
 from backend.services import find_ticket_by_id
 from backend.services import save_ticket
-
+from backend.services import resolve_ticket_service
 
 app = FastAPI()
 
@@ -34,10 +34,9 @@ def create_ticket(ticket: TicketCreate):
 
 @app.patch("/tickets/{ticket_id}")
 def resolve_ticket(ticket_id: int):
-    reResult = find_ticket_by_id(ticket_id)
-    if reResult == None:
+    reResult = resolve_ticket_service(ticket_id)
+    if reResult is None:
         raise HTTPException(status_code = 404, detail = "Ticket not found")
-    elif reResult["status"] == "Resolved":
+    elif reResult == "Ticket already resolved":
         raise HTTPException(status_code = 409, detail = "Ticket already resolved")
-    reResult["status"] = "Resolved"
     return {"message": "Ticket resolved successfully", "ticket": reResult}
